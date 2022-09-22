@@ -175,11 +175,11 @@ public class MysqlGenerator {
     }
 
     private static String generateAddField(Field field) {
-        return String.format("ADD COLUMN  `%s` %s %s,", field.getFieldName(), field.getFieldType(), field.getExtra());
+        return String.format("ADD COLUMN  `%s` %s %s", field.getFieldName(), field.getFieldType(), field.getExtra());
     }
 
     private static String generateModifyField(Field field) {
-        return String.format("MODIFY COLUMN  `%s` %s %s,", field.getFieldName(), field.getFieldType(),
+        return String.format("MODIFY COLUMN  `%s` %s %s", field.getFieldName(), field.getFieldType(),
                 field.getExtra());
     }
 
