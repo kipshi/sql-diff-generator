@@ -108,17 +108,20 @@ public class MysqlParser {
                 .forEach(
                         subSql -> {
                             if (subSql.startsWith("KEY")) {
+                                Index idx = parseKey(subSql);
+                                indexs.put(idx.getKeyName(), idx);
+                            } else if (subSql.startsWith("INDEX")) {
                                 Index idx = parseIndex(subSql);
                                 indexs.put(idx.getKeyName(), idx);
-                            }
-                            if (subSql.startsWith("UNIQUE KEY")) {
+                            } else if (subSql.startsWith("UNIQUE KEY")) {
                                 UniqueKey uniqueKey = parseUniqKey(subSql);
                                 uniqueKeys.put(uniqueKey.getKeyName(), uniqueKey);
-                            }
-                            if (subSql.startsWith("PRIMARY KEY")) {
+                            } else if (subSql.startsWith("UNIQUE INDEX")) {
+                                UniqueKey uniqueKey = parseUniqIndex(subSql);
+                                uniqueKeys.put(uniqueKey.getKeyName(), uniqueKey);
+                            } else if (subSql.startsWith("PRIMARY KEY")) {
                                 primaryKey[0] = parsePrimaryKey(subSql);
-                            }
-                            if (subSql.contains("COMMENT")) {
+                            } else if (StringUtils.isNotBlank(subSql)) {
                                 Field field = parseField(subSql);
                                 fields.put(field.getFieldName(), field);
                             }
@@ -129,6 +132,17 @@ public class MysqlParser {
     }
 
     private static Index parseIndex(String sql) {
+        String originSql = sql;
+        sql = sql.replace("INDEX", "").trim();
+        int startIndex = sql.indexOf("(");
+        int endIndex = sql.indexOf(")");
+        List<String> fields = Stream.of(sql.substring(startIndex + 1, endIndex)
+                .split(",")).map(field -> field.replace("`", "")).collect(Collectors.toList());
+        String indexName = sql.substring(0, startIndex).replace("`", "").trim();
+        return new Index(originSql, indexName, fields);
+    }
+
+    private static Index parseKey(String sql) {
         String originSql = sql;
         sql = sql.replace("KEY", "").trim();
         int startIndex = sql.indexOf("(");
@@ -142,6 +156,17 @@ public class MysqlParser {
     private static UniqueKey parseUniqKey(String sql) {
         String originSql = sql;
         sql = sql.replace("UNIQUE KEY", "").trim();
+        int startIndex = sql.indexOf("(");
+        int endIndex = sql.indexOf(")");
+        List<String> fields = Stream.of(sql.substring(startIndex + 1, endIndex)
+                .split(",")).map(field -> field.replace("`", "")).collect(Collectors.toList());
+        String keyName = sql.substring(0, startIndex).replace("`", "").trim();
+        return new UniqueKey(originSql, keyName, fields);
+    }
+
+    private static UniqueKey parseUniqIndex(String sql) {
+        String originSql = sql;
+        sql = sql.replace("UNIQUE INDEX", "").trim();
         int startIndex = sql.indexOf("(");
         int endIndex = sql.indexOf(")");
         List<String> fields = Stream.of(sql.substring(startIndex + 1, endIndex)

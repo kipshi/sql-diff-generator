@@ -40,7 +40,7 @@ public class SqlFile {
                 BufferedReader bufferedReader = new BufferedReader(fileReader);) {
             return MysqlParser.parse(bufferedReader);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
