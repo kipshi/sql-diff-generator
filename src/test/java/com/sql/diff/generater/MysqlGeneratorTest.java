@@ -25,7 +25,7 @@ import org.junit.Test;
 public class MysqlGeneratorTest {
 
     @Test
-    public void testUpgradeSql(){
+    public void testUpgradeSql() {
         String rootPath = this.getClass().getClassLoader().getResource("").getPath();
         String originFile = rootPath + "origin.sql";
         SqlFile originSqlFile = new SqlFile(originFile);
@@ -33,7 +33,7 @@ public class MysqlGeneratorTest {
         String targetFile = rootPath + "target.sql";
         SqlFile targetSqlFile = new SqlFile(targetFile);
         DataBase targetDB = targetSqlFile.parse();
-        String sql = MysqlGenerator.upgradeSql(originDB,targetDB);
+        String sql = MysqlGenerator.upgradeSql(originDB, targetDB);
         System.out.println(sql);
     }
 

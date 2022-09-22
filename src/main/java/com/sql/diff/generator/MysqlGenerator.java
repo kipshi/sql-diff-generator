@@ -199,10 +199,24 @@ public class MysqlGenerator {
         String extSql = "";
         for (String sql : targetSqls) {
             if (!originSqls.contains(sql)) {
+                String truncateSql = generateTruncateSql(sql);
+                if (truncateSql != null) {
+                    extSql += truncateSql + "\n";
+                }
                 extSql += sql + "\n";
             }
         }
         return extSql;
+    }
+
+    private static String generateTruncateSql(String sql) {
+        if (!sql.startsWith("INSERT INTO")) {
+            return null;
+        }
+        sql = sql.replace("INSERT INTO", "");
+        int endIndex = sql.indexOf("(");
+        String tableName = sql.substring(0, endIndex).replace("`", "").trim();
+        return String.format("TRUNCATE TABLE %s;", tableName);
     }
 
     private static String generateDropTable(String tableName) {
